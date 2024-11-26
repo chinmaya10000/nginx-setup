@@ -21,7 +21,7 @@ sudo apt install docker-compose -y
 ```
 docker build -t myapp:1.0 .
 docker-compose up --build -d
-
+```
 ### 4. Install Nginx
 ```
 sudo apt install nginx -y
