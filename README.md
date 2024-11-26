@@ -14,34 +14,91 @@ sudo apt-get update -y
 sudo apt-get install docker.io -y
 sudo usermod -aG docker ubuntu
 sudo systemctl enable --now docker
+sudo apt install docker-compose -y
 ```
 
 ### 3. Build Docker Image and run 2 docker container from compose
 ```
 docker build -t myapp:1.0 .
-docker
+docker-compose up --build -d
 
-##### start nginx
-`nginx`
+### 4. Install Nginx
+```
+sudo apt install nginx -y
+nginx -v
+```
 
-##### get options
-`nginx -h`
+### 5. Configure nginx.conf
+```
+# Main context (this is the global configuration)
+worker_processes 1;
 
-##### restart nginx
-`nginx -s reload`
+events {
+    worker_connections 1024;
+}
 
-##### stop nginx
-`nginx -s stop`  
+http {
+    include mime.types;
+    
+    # Upstream block to define the Node.js backend servers
+    upstream nodejs_cluster {
+        least_conn;
+        server 127.0.0.1:3001;
+        server 127.0.0.1:3002;
+        server 127.0.0.1:3003;
+    }
 
-##### print logs
-`tail -f /usr/local/var/log/nginx/access.log`
+    server {
+        listen 443 ssl;   # Listen on port 443 for HTTPS
+        server_name 18.117.86.145;
+        
+        # SSL certificate settings
+        ssl_certificate /home/ubuntu/nginx-certs/nginx-selfsigned.crt;
+        ssl_certificate_key /home/ubuntu/nginx-certs/nginx-selfsigned.key;
+        
+        # Proxying requests to Node.js cluster
+        location / {
+            proxy_pass http://nodejs_cluster;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+    }
+    
+    # Optional server block for HTTP to HTTPS redirection
+    server {
+        listen 8080;  # Listen on port 80 for HTTP
+        server_name 18.117.86.145;
 
-##### restart nginx
-`nginx -s reload`
+        # Redirect all HTTP traffic to HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+}
+```
 
-##### create folder for nginx certificates
-`mkdir ~/nginx-certs`
-`cd ~/nginx-certs`
+### 6. Reload nginx
+```
+sudo systemctl reload nginx
+cat /var/log/nginx/access.log
+cat /var/log/nginx/error.log
+http://18.117.86.145:8080
+```
 
-##### create self-signed certificate
-`openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-selfsigned.key -out nginx-selfsigned.crt`
+### 7. Generate SSL Certificates:
+- create folder for nginx certificates
+```
+mkdir ~/nginx-certs
+cd ~/nginx-certs
+```
+- create self-signed certificate
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-selfsigned.key -out nginx-selfsigned.crt
+ls
+cat nginx-certs/nginx-selfsigned.crt
+```
+
+### 8. Test
+```
+https://18.117.86.145/
+```
