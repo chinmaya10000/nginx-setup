@@ -30,7 +30,6 @@ nginx -v
 
 ### 5. Configure nginx.conf
 ```
-# Main context (this is the global configuration)
 worker_processes 1;
 
 events {
