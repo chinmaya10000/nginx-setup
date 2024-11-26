@@ -102,3 +102,14 @@ sudo systemctl reload nginx
 ```
 https://18.117.86.145/
 ```
+
+## System Architecture
+
+### 1. Load Balancer
+The diagram below illustrates how the Nginx server acts as a load balancer, routing requests to two backend servers on different ports.
+![Load Balancer Diagram](assets/load-balancer.png)
+
+### 2. HTTPS Setup
+The diagram below shows the HTTPS configuration for secure communication using SSL/TLS.
+
+![HTTPS Diagram](assets/https-diagram.png)
