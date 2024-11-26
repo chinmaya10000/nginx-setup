@@ -1,6 +1,25 @@
-### This is a project accompanying Nginx Crash Course
+### Nginx Setup with SSL and WebSocket Support
 
-### Commands used in the tutorial
+## Steps
+
+### 1. Server Provisioning
+- I am using AWS as the Cloud Provider
+- Provision an EC2 instance on AWS with a secure Linux distribution (e.g., Ubuntu 24.04).
+- Configure security groups to allow necessary incoming traffic and restrict unnecessary access.
+- Generate and configure SSH key pairs for secure remote acces.
+
+### 2. Install Docker and Docker-compose on ths machine
+```
+sudo apt-get update -y
+sudo apt-get install docker.io -y
+sudo usermod -aG docker ubuntu
+sudo systemctl enable --now docker
+```
+
+### 3. Build Docker Image and run 2 docker container from compose
+```
+docker build -t myapp:1.0 .
+docker
 
 ##### start nginx
 `nginx`
